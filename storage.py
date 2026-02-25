@@ -1,11 +1,10 @@
 import json
 import os
-from typing import List
 from pydantic import TypeAdapter, ValidationError
 from models import Task
 
 # Create an adapter to handle a list of Task objects
-task_list_adapter = TypeAdapter(List[Task])
+task_list_adapter = TypeAdapter(list[Task])
 
 
 def initialize_db(file_path: str):
@@ -15,7 +14,7 @@ def initialize_db(file_path: str):
             json.dump([], f, indent=4)
 
 
-def load_tasks(file_path: str) -> List[Task]:
+def load_tasks(file_path: str) -> list[Task]:
     """Reads tasks from JSON and validates the entire list via Pydantic."""
     initialize_db(file_path)  # Ensure the file exists before reading
     try:
@@ -28,7 +27,7 @@ def load_tasks(file_path: str) -> List[Task]:
         return []
 
 
-def save_tasks(tasks: List[Task], file_path: str):
+def save_tasks(tasks: list[Task], file_path: str):
     """Saves a list of Task objects to JSON with pretty-printing."""
     with open(file_path, "w") as f:
         # model_dump(mode='json') handles the conversion of datetime/UUID to strings
