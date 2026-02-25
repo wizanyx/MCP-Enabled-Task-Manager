@@ -1,31 +1,36 @@
-#storage.py - charles cain - 2.24.26
-
 import json
+import os
+from typing import List
+from pydantic import TypeAdapter, ValidationError
+from models import Task
 
-from pydantic import TypeAdapter
+# Create an adapter to handle a list of Task objects
+task_list_adapter = TypeAdapter(List[Task])
 
-from task import Task
 
-"""reads json file and returns a dictionary of all tasks"""
-def read_json(file_path) -> list[Task]:
+def initialize_db(file_path: str):
+    """Creates an empty tasks.json file if it doesn't exist."""
+    if not os.path.exists(file_path):
+        with open(file_path, "w") as f:
+            json.dump([], f, indent=4)
+
+
+def load_tasks(file_path: str) -> List[Task]:
+    """Reads tasks from JSON and validates the entire list via Pydantic."""
+    initialize_db(file_path)  # Ensure the file exists before reading
     try:
-        with open(file_path, 'r') as json_file:
-            json_data = json.load(json_file)
-    except (json.JSONDecodeError, FileNotFoundError):
-        #returns empty list
+        with open(file_path, "r") as f:
+            data = json.load(f)
+            # Validates that the JSON data matches the List[Task] structure
+            return task_list_adapter.validate_python(data)
+    except (json.JSONDecodeError, ValidationError, FileNotFoundError):
+        # If file is corrupt or invalid, return an empty list for safety
         return []
 
-    #Converts from JSON to Tasks:
-    return TypeAdapter(list[Task]).validate_python(json_data)
 
-"""takes a list of task objects in a dictionary and writes to file"""
-def write_json(tasks: list[Task], file_path):
-    #opens file and OVERWRITES it ('w')
-    #closes after the 'with' block
-    with open(file_path, 'w') as json_file:
-        #convert task list to json
-        #brackets make it a list
-        task_json = [t.model_dump(mode='json') for t in tasks]
-
-        #indent = 4 is default tab size
-        json.dump(task_json, json_file, indent=4)
+def save_tasks(tasks: List[Task], file_path: str):
+    """Saves a list of Task objects to JSON with pretty-printing."""
+    with open(file_path, "w") as f:
+        # model_dump(mode='json') handles the conversion of datetime/UUID to strings
+        json_data = [t.model_dump(mode="json") for t in tasks]
+        json.dump(json_data, f, indent=4)
