@@ -13,10 +13,25 @@ def add_task(title: str, description: str = "", file_path: str = DB_FILE) -> Tas
     save_tasks(tasks, file_path)
     return new_task
 
+def get_task(task_id: str, file_path: str = DB_FILE) -> Task:
+    """Returns a single task by id.
 
-def get_tasks(file_path: str = DB_FILE) -> list[Task]:
+    Raises:
+        ValueError: If the provided task_id does not exist.
+    """
+    tasks = load_tasks(file_path)
+    for task in tasks:
+        if task.id == task_id:
+            return task
+
+    raise ValueError(f"Task with id '{task_id}' was not found.")
+
+def get_tasks(file_path: str = DB_FILE, status: Literal["pending", "completed"] | None = None) -> list[Task]:
     """Returns all persisted tasks."""
-    return load_tasks(file_path)
+    tasks = load_tasks(file_path)
+    if status is not None:
+        tasks = [task for task in tasks if task.status == status]
+    return tasks
 
 
 def update_task(
