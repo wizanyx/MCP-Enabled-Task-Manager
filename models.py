@@ -7,20 +7,24 @@ from typing import Literal
 class Task(BaseModel):
     id: str = Field(
         default_factory=lambda: str(uuid4()),
-        description="Unique identifier for the task",
+        description="Stable UUID for the task. Use this exact value when updating or deleting an existing task.",
     )
     title: str = Field(
-        ..., min_length=1, description="The short title or name of the task"
+        ...,
+        min_length=1,
+        description="Short action-oriented task title, e.g. 'Submit report'. Must not be empty.",
     )
     description: str = Field(
-        default="", description="A more detailed explanation of what needs to be done"
+        default="",
+        description="Optional task details, constraints, or context that clarify what needs to be done.",
     )
     status: Literal["pending", "completed"] = Field(
-        default="pending", description="The current state of the task"
+        default="pending",
+        description="Execution state of the task. Use 'pending' for open work and 'completed' for finished work.",
     )
     created_at: datetime = Field(
         default_factory=datetime.now,
-        description="The ISO timestamp when the task was created",
+        description="Creation timestamp in ISO 8601 format. Generated automatically when a task is created.",
     )
 
     class Config:
