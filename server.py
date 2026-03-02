@@ -1,14 +1,17 @@
+from typing import Literal
+
 from mcp.server.fastmcp import FastMCP
 import controller
-import logging 
+import logging
 
-#Initialize FastMCP server
-#The name "TaskManager" is what will show up in the LLM UI
+# Initialize FastMCP server
+# The name "TaskManager" is what will show up in the LLM UI
 mcp = FastMCP("Task Manager")
 
-#Configure logging 
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("mcp-todo")
+
 
 @mcp.tool()
 def add_new_task(title: str, description: str = "") -> str:
@@ -17,24 +20,26 @@ def add_new_task(title: str, description: str = "") -> str:
     task = controller.add_task(title, description)
     return f"Task created with ID: {task.id}"
 
+
 @mcp.tool()
-def get_all_tasks(status: str = None) -> str:
+def get_all_tasks(status: Literal["pending", "completed"] | None = None) -> str:
     """
     List tasks from the database.
     Optional status filter: 'pending' or 'completed'
     """
 
     logger.info(f"Tool called: get_all_tasks(status = '{status}')")
-    tasks = controller.get_tasks(status = status)
-    if not tasks: 
+    tasks = controller.get_tasks(status=status)
+    if not tasks:
         return "No tasks found"
-    
-    # Format the list for the LLM to read easily 
+
+    # Format the list for the LLM to read easily
     output = "Current Tasks:\n"
     for t in tasks:
         status_icon = "✅" if t.status == "completed" else "⏳"
         output += f"- [{status_icon}] {t.title} (ID: {t.id})\n  {t.description}\n"
     return output
+
 
 @mcp.tool()
 def complete_task(task_id: str) -> str:
@@ -44,6 +49,7 @@ def complete_task(task_id: str) -> str:
     if task:
         return f"Task '{task.title}' marked as completed"
     return f"Error: Task with ID {task_id} not found."
+
 
 @mcp.tool()
 def remove_task(task_id: str) -> str:
@@ -56,6 +62,5 @@ def remove_task(task_id: str) -> str:
 
 
 if __name__ == "__main__":
-    #Start the server
+    # Start the server
     mcp.run()
-    

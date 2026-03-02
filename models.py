@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 from typing import Literal
 
@@ -23,7 +23,7 @@ class Task(BaseModel):
         description="Execution state of the task. Use 'pending' for open work and 'completed' for finished work.",
     )
     created_at: datetime = Field(
-        default_factory=datetime.now,
+        default_factory=lambda: datetime.now(timezone.utc),
         description="Creation timestamp in ISO 8601 format. Generated automatically when a task is created.",
     )
 

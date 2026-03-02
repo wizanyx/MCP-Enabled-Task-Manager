@@ -1,9 +1,10 @@
 from typing import Literal
+from pathlib import Path
 
 from models import Task
 from storage import load_tasks, save_tasks
 
-DB_FILE = "tasks.json"
+DB_FILE = str(Path(__file__).resolve().parent / "tasks.json")
 
 def add_task(title: str, description: str = "", file_path: str = DB_FILE) -> Task:
     """Creates and persists a new task, then returns it."""
@@ -13,20 +14,18 @@ def add_task(title: str, description: str = "", file_path: str = DB_FILE) -> Tas
     save_tasks(tasks, file_path)
     return new_task
 
-def get_task(task_id: str, file_path: str = DB_FILE) -> Task:
-    """Returns a single task by id.
-
-    Raises:
-        ValueError: If the provided task_id does not exist.
-    """
+def get_task(task_id: str, file_path: str = DB_FILE) -> Task | None:
+    """Returns a single task by id."""
     tasks = load_tasks(file_path)
     for task in tasks:
         if task.id == task_id:
             return task
 
-    raise ValueError(f"Task with id '{task_id}' was not found.")
+    return None
 
-def get_tasks(file_path: str = DB_FILE, status: Literal["pending", "completed"] | None = None) -> list[Task]:
+def get_tasks(
+    status: Literal["pending", "completed"] | None = None, file_path: str = DB_FILE
+) -> list[Task]:
     """Returns all persisted tasks."""
     tasks = load_tasks(file_path)
     if status is not None:
@@ -40,12 +39,8 @@ def update_task(
     description: str | None = None,
     status: Literal["pending", "completed"] | None = None,
     file_path: str = DB_FILE,
-) -> Task:
-    """Updates a task and returns it.
-
-    Raises:
-        ValueError: If the provided task_id does not exist.
-    """
+) -> Task | None:
+    """Updates a task and returns it."""
     tasks = load_tasks(file_path)
     for index, task in enumerate(tasks):
         if task.id == task_id:
@@ -61,16 +56,12 @@ def update_task(
             tasks[index] = updated_task
             save_tasks(tasks, file_path)
             return updated_task
+    
+    return None
 
-    raise ValueError(f"Task with id '{task_id}' was not found.")
 
-
-def delete_task(task_id: str, file_path: str = DB_FILE) -> str:
-    """Deletes a task by id and returns a confirmation message.
-
-    Raises:
-        ValueError: If the provided task_id does not exist.
-    """
+def delete_task(task_id: str, file_path: str = DB_FILE) -> bool:
+    """Deletes a task by id and returns a confirmation message."""
     tasks = load_tasks(file_path)
     for index, task in enumerate(tasks):
         if task.id == task_id:
