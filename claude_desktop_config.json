@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "todo-manager": {
+            "command": "/path/to/your/venv/bin/python", 
+            "args": [
+                "/path/to/your/repo/server.py"
+            ]
+
+        }
+    }
+}

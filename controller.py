@@ -76,9 +76,9 @@ def delete_task(task_id: str, file_path: str = DB_FILE) -> str:
         if task.id == task_id:
             tasks.pop(index)
             save_tasks(tasks, file_path)
-            return f"Task '{task_id}' deleted successfully."
+            return True
 
-    raise ValueError(f"Task with id '{task_id}' was not found.")
+    return False
 
 def clear_completed(file_path: str = DB_FILE) -> int:
     """Removes all tasks marked as completed. Returns count of removed tasks."""
