@@ -12,3 +12,5 @@ dist/
 .env
 .env.*
 .DS_Store
+
+data/

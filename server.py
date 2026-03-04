@@ -24,6 +24,7 @@ def add_new_task(title: str, description: str = "") -> str:
 @mcp.tool()
 def get_task_by_id(task_id: str) -> str:
     """Retrieve a single task by its ID."""
+    logger.info(f"Tool called: get_task_by_id(id = '{task_id}')")
     task = controller.get_task(task_id)
     if task:
         return f"Task: {task.title}\nStatus: {task.status}\nDescription: {task.description}"
@@ -36,7 +37,6 @@ def get_all_tasks(status_filter: Literal["pending", "completed"] | None = None) 
     List tasks from the database.
     Optional status filter: 'pending' or 'completed'
     """
-
     logger.info(f"Tool called: get_all_tasks(status_filter = '{status_filter}')")
     tasks = controller.get_tasks(status=status_filter)
     if not tasks:
@@ -65,6 +65,7 @@ def update_task(
     task_id: str, title: str | None = None, description: str | None = None
 ) -> str:
     """Update the title or description of an existing task."""
+    logger.info(f"Tool called: update_task(id='{task_id}')")
     task = controller.update_task(task_id, title=title, description=description)
     if task:
         return f"Task '{task.id}' updated successfully."
@@ -84,10 +85,11 @@ def remove_task(task_id: str) -> str:
 @mcp.tool()
 def clear_completed_tasks() -> str:
     """Remove all completed tasks from the list."""
+    logger.info("Tool called: clear_completed_tasks()")
     count = controller.clear_completed()
     return f"Removed {count} completed task(s)."
 
 
 if __name__ == "__main__":
-    # Start the server
+    logger.info("Server start: Task Manager MCP server is starting")
     mcp.run()
