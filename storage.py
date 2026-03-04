@@ -28,9 +28,9 @@ def _quarantine_corrupt_file(file_path: str, error: Exception):
     try:
         if os.path.exists(file_path):
             os.replace(file_path, backup_path)
-            logger.error("Corrupt tasks DB moved to %s (%s)", backup_path, error)
+            logger.error(f"Corrupt tasks DB moved to {backup_path} ({error})")
     except OSError:
-        logger.exception("Failed to quarantine corrupt DB file: %s", file_path)
+        logger.exception(f"Failed to quarantine corrupt DB file: {file_path}")
     finally:
         initialize_db(file_path)
 
@@ -57,7 +57,19 @@ def save_tasks(tasks: list[Task], file_path: str):
     if directory:
         os.makedirs(directory, exist_ok=True)
     json_data = [t.model_dump(mode="json") for t in tasks]
-    with tempfile.NamedTemporaryFile(mode="w", dir=directory, delete=False, encoding="utf-8") as tmp:
-        json.dump(json_data, tmp, indent=4)
-        tmp_path = tmp.name
-    os.replace(tmp_path, file_path)
+    tmp_path = ""
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", dir=directory, delete=False, encoding="utf-8"
+        ) as tmp:
+            json.dump(json_data, tmp, indent=4)
+            tmp_path = tmp.name
+        os.replace(tmp_path, file_path)
+    except OSError:
+        logger.exception(f"File write error while saving tasks to {file_path}")
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                logger.exception(f"Failed to clean up temp task file: {tmp_path}")
+        raise

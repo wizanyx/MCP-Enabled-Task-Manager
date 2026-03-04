@@ -91,5 +91,5 @@ def clear_completed_tasks() -> str:
 
 
 if __name__ == "__main__":
-    # Start the server
+    logger.info("Server start: Task Manager MCP server is starting")
     mcp.run()

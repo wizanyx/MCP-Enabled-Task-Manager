@@ -1,10 +1,13 @@
 from typing import Literal
 from pathlib import Path
+import logging
 
 from models import Task
 from storage import load_tasks, save_tasks
 
 DB_FILE = str(Path(__file__).resolve().parent / "data" / "tasks.json")
+logger = logging.getLogger("mcp-todo")
+
 
 def add_task(title: str, description: str = "", file_path: str = DB_FILE) -> Task:
     """Creates and persists a new task, then returns it."""
@@ -14,6 +17,7 @@ def add_task(title: str, description: str = "", file_path: str = DB_FILE) -> Tas
     save_tasks(tasks, file_path)
     return new_task
 
+
 def get_task(task_id: str, file_path: str = DB_FILE) -> Task | None:
     """Returns a single task by id."""
     tasks = load_tasks(file_path)
@@ -22,6 +26,7 @@ def get_task(task_id: str, file_path: str = DB_FILE) -> Task | None:
             return task
 
     return None
+
 
 def get_tasks(
     status: Literal["pending", "completed"] | None = None, file_path: str = DB_FILE
@@ -67,9 +72,11 @@ def delete_task(task_id: str, file_path: str = DB_FILE) -> bool:
         if task.id == task_id:
             tasks.pop(index)
             save_tasks(tasks, file_path)
+            logger.info(f"Deletion: removed task id={task_id}")
             return True
 
     return False
+
 
 def clear_completed(file_path: str = DB_FILE) -> int:
     """Removes all tasks marked as completed. Returns count of removed tasks."""
@@ -77,4 +84,7 @@ def clear_completed(file_path: str = DB_FILE) -> int:
     initial_count = len(tasks)
     tasks = [t for t in tasks if t.status != "completed"]
     save_tasks(tasks, file_path)
-    return initial_count - len(tasks)
+    removed_count = initial_count - len(tasks)
+    if removed_count > 0:
+        logger.info(f"Deletion: cleared {removed_count} completed task(s)")
+    return removed_count
