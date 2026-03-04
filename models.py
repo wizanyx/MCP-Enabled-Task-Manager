@@ -26,7 +26,3 @@ class Task(BaseModel):
         default_factory=lambda: datetime.now(timezone.utc),
         description="Creation timestamp in ISO 8601 format. Generated automatically when a task is created.",
     )
-
-    class Config:
-        # Ensures datetime is serialized as an ISO string in JSON
-        json_encoders = {datetime: lambda v: v.isoformat()}

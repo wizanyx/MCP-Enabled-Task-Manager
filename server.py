@@ -22,14 +22,22 @@ def add_new_task(title: str, description: str = "") -> str:
 
 
 @mcp.tool()
-def get_all_tasks(status: Literal["pending", "completed"] | None = None) -> str:
+def get_task_by_id(task_id: str) -> str:
+    """Retrieve a single task by its ID."""
+    task = controller.get_task(task_id)
+    if task:
+        return f"Task: {task.title}\nStatus: {task.status}\nDescription: {task.description}"
+    return f"Error: Task with ID {task_id} not found."
+
+
+def get_all_tasks(status_filter: Literal["pending", "completed"] | None = None) -> str:
     """
     List tasks from the database.
     Optional status filter: 'pending' or 'completed'
     """
 
-    logger.info(f"Tool called: get_all_tasks(status = '{status}')")
-    tasks = controller.get_tasks(status=status)
+    logger.info(f"Tool called: get_all_tasks(status_filter = '{status_filter}')")
+    tasks = controller.get_tasks(status=status_filter)
     if not tasks:
         return "No tasks found"
 
@@ -52,6 +60,17 @@ def complete_task(task_id: str) -> str:
 
 
 @mcp.tool()
+def update_task(
+    task_id: str, title: str | None = None, description: str | None = None
+) -> str:
+    """Update the title or description of an existing task."""
+    task = controller.update_task(task_id, title=title, description=description)
+    if task:
+        return f"Task '{task.id}' updated successfully."
+    return f"Error: Task with ID {task_id} not found."
+
+
+@mcp.tool()
 def remove_task(task_id: str) -> str:
     """Delete a task from the list permanently."""
     logger.info(f"Tool called: remove_task(id='{task_id}')")
@@ -59,6 +78,13 @@ def remove_task(task_id: str) -> str:
     if success:
         return "Task successfully deleted"
     return f"Error: Task with ID {task_id} not found"
+
+
+@mcp.tool()
+def clear_completed_tasks() -> str:
+    """Remove all completed tasks from the list."""
+    count = controller.clear_completed()
+    return f"Removed {count} completed task(s)."
 
 
 if __name__ == "__main__":
