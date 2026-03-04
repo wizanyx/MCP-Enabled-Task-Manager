@@ -30,6 +30,7 @@ def get_task_by_id(task_id: str) -> str:
     return f"Error: Task with ID {task_id} not found."
 
 
+@mcp.tool()
 def get_all_tasks(status_filter: Literal["pending", "completed"] | None = None) -> str:
     """
     List tasks from the database.
