@@ -4,7 +4,7 @@ from pathlib import Path
 from models import Task
 from storage import load_tasks, save_tasks
 
-DB_FILE = str(Path(__file__).resolve().parent / "tasks.json")
+DB_FILE = str(Path(__file__).resolve().parent / "data" / "tasks.json")
 
 def add_task(title: str, description: str = "", file_path: str = DB_FILE) -> Task:
     """Creates and persists a new task, then returns it."""

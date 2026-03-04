@@ -1,6 +1,7 @@
 import json
 import os
 import logging
+import tempfile
 from datetime import datetime, timezone
 from pydantic import TypeAdapter, ValidationError
 from models import Task
@@ -55,7 +56,8 @@ def save_tasks(tasks: list[Task], file_path: str):
     directory = os.path.dirname(file_path)
     if directory:
         os.makedirs(directory, exist_ok=True)
-    with open(file_path, "w", encoding="utf-8") as f:
-        # model_dump(mode='json') handles the conversion of datetime/UUID to strings
-        json_data = [t.model_dump(mode="json") for t in tasks]
-        json.dump(json_data, f, indent=4)
+    json_data = [t.model_dump(mode="json") for t in tasks]
+    with tempfile.NamedTemporaryFile(mode="w", dir=directory, delete=False, encoding="utf-8") as tmp:
+        json.dump(json_data, tmp, indent=4)
+        tmp_path = tmp.name
+    os.replace(tmp_path, file_path)
