@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "todo-manager": {
+            "command": " C:/Users/kande/Desktop/SoftwareEngineering/MCP-Enabled-Task-Manager/venv/Scripts/python.exe", 
+            "args": [
+                " C:/Users/kande/Desktop/SoftwareEngineering/MCP-Enabled-Task-Manager/server.py"
+            ]
+
+        }
+    }
+}

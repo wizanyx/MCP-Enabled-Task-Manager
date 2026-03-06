@@ -19,6 +19,38 @@ Since the program uses FastMCP it is also designed to be used by LLMs.
 
 The user can create a new task, get information about a specific task, see the list of current tasks, remove a task, update an individual task, and also clear all completed tasks from the list of tasks.
 
+
 ## MCP Tools
 
+The application exposes the backend logic to LLMs via the following Model Context Protocol tools. Each tool is decorated with `@mcp.tool()` and includes metadata to help the AI understand when and how to use it.
 
+| Tool Name | Parameters | Description |
+| :--- | :--- | :--- |
+| `add_new_task` | `title`, `description` | Creates a new task and assigns a unique UUID. |
+| `get_all_tasks` | `status` (optional) | Returns a list of tasks, optionally filtered by 'pending' or 'completed'. |
+| `complete_task` | `task_id` | Marks a specific task as completed using its unique ID string. |
+| `remove_task` | `task_id` | Permanently deletes a task from the JSON database. |
+| `clear_completed`| None | Removes all tasks currently marked as 'completed' to clean the list. |
+
+
+## 🔧 Claude Desktop Integration
+
+To use this service with Claude Desktop, you must point the client to your project's Python environment. 
+
+1. Locate your configuration file:
+   - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+   - **macOS/Linux:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+2. Add this project to the `mcpServers` object:
+
+```json
+{
+  "mcpServers": {
+    "mcp-task-manager": {
+      "command": "/path/to/your/project/.venv/bin/python",
+      "args": [
+        "/path/to/your/project/server.py"
+      ]
+    }
+  }
+}
