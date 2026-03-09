@@ -54,7 +54,7 @@ def test_get_all_tasks_formats_pending_and_completed(monkeypatch):
 
     monkeypatch.setattr(server.controller, "get_tasks", lambda status=None: tasks)
 
-    result = server.get_all_tasks(status_filter="pending")
+    result = server.get_all_tasks()
 
     assert result.startswith("Current Tasks:\n")
     assert "- [⏳] One (ID: 1)\n  A\n" in result
@@ -82,14 +82,14 @@ def test_update_task_success_and_not_found(monkeypatch):
         server.controller,
         "update_task",
         lambda task_id, title=None, description=None, status=None: (
-            SimpleNamespace(id="abc") if task_id == "abc" else None
+            SimpleNamespace(title=title) if task_id == "abc" else None
         ),
     )
 
     success = server.update_task("abc", title="New")
     not_found = server.update_task("missing", description="x")
 
-    assert success == "Task 'abc' updated successfully."
+    assert success == "Task 'New' updated successfully."
     assert not_found == "Error: Task with ID missing not found."
 
 

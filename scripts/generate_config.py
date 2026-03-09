@@ -10,4 +10,4 @@ config = {
         }
     }
 }
-print(json.dumps(config, indent=4))
+print(json.dumps(config, indent=2))

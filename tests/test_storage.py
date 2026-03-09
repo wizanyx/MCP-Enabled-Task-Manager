@@ -72,7 +72,7 @@ def test_save_tasks_re_raises_on_write_error(storage_db_path, monkeypatch):
         storage.save_tasks([Task(title="X")], storage_db_path)
 
 
-def test_quarantine_handles_replace_oserror_and_reinitializes(
+def test_quarantine_logs_error_and_leaves_file_intact_when_replace_fails(
     storage_db_path, monkeypatch
 ):
     with open(storage_db_path, "w", encoding="utf-8") as f:

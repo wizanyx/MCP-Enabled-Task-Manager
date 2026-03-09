@@ -68,7 +68,7 @@ def update_task(
     logger.info(f"Tool called: update_task(id='{task_id}')")
     task = controller.update_task(task_id, title=title, description=description)
     if task:
-        return f"Task '{task.id}' updated successfully."
+        return f"Task '{task.title}' updated successfully."
     return f"Error: Task with ID {task_id} not found."
 
 
